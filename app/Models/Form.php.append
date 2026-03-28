@@ -1,0 +1,4 @@
+    public function getWhatsappImageUrlAttribute()
+    {
+        return $this->whatsapp_image ? asset('storage/' . $this->whatsapp_image) : null;
+    }
