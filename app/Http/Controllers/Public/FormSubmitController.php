@@ -419,6 +419,7 @@ class FormSubmitController extends Controller
     {
         try {
             $response->load(['store.whatsappDevice', 'form']);
+            dd($response->store, $response->store->whatsappDevice);
             if (!$response->store || !$response->store->whatsappDevice) {
                 Log::warning('WA not sent: device not found', ['response_id' => $response->id]);
                 return;
