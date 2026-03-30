@@ -394,7 +394,7 @@ class FormSubmitController extends Controller
                         'error' => $e->getMessage()
                     ]);
                 }
-            }
+            
         } catch (\Throwable $e) {
             Log::error('WA error', [
                 'response_id' => $response->id,
@@ -403,7 +403,7 @@ class FormSubmitController extends Controller
         }
     }
     private function sendEmailNotification(Response $response) 
-    {  }
+    { /* ... */ }
     
 
     private function sendWhatsAppMessageWithImage(Response $response)

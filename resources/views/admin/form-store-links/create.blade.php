@@ -53,7 +53,7 @@
                 <!-- Stores -->
                 <div class="group">
                     <label class="block text-3xl font-black text-gray-900 mb-8">
-                        🏪 Choose Store
+                         Choose Store
                     </label>
                     <div class="relative">
                         <select name="store_id" id="store_select" required 
