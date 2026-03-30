@@ -316,11 +316,13 @@ class GowaService
             return [
                 'success' => false,
                 'message' => 'Failed to send image',
-                'error' => $response->body()
+                'error' => $response->body(),
+                'status' => $response->status(),
+                'body' => $response->body()
             ];
 
         } catch (\Exception $e) {
-            Log::error('Error sending image', [
+            Log::error('Error sending image in try', [
                 'device_id' => $deviceId,
                 'phone' => $phone,
                 'error' => $e->getMessage()
@@ -329,7 +331,9 @@ class GowaService
             return [
                 'success' => false,
                 'message' => 'Error sending image',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'status' => $response->status(),
+                'body' => $response->body()
             ];
         }
     }
