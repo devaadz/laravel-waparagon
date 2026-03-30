@@ -14,7 +14,7 @@ return new class extends Migration
                 $table->uuid('form_id');
                 $table->foreign('form_id')->references('id')->on('forms')->onDelete('cascade');
                 $table->foreignId('response_id')->constrained('responses')->onDelete('cascade');
-                $table->enum('type', ['email', 'whatsapp']); // email atau whatsapp
+                $table->string('type')->nullable(); // email atau whatsapp
                 $table->string('recipient')->nullable(); // email atau nomor WA
                 $table->text('message')->nullable();
                 $table->enum('status', ['pending', 'sent', 'failed'])->default('pending');
