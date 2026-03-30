@@ -35,6 +35,7 @@
                     <th class="border px-6 py-3 text-left">Form URL</th>
                     <th class="border px-6 py-3 text-left">QR Code</th>
                     <th class="border px-6 py-3 text-left">Created</th>
+                    <th class="border px-6 py-3 text-left">Actions</th>
                 </tr>
             </thead>
             <tbody>
