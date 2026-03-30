@@ -19,8 +19,8 @@ class GowaService
     {
         $this->baseUrl = config('services.gowa.url', env('GOWA_URL'));
         $this->defaultDeviceId = config('services.gowa.device_id', env('GOWA_DEVICE_ID', 'default_device'));
-        // $this->username = env('GOWA_USERNAME');
-        // $this->password = env('GOWA_PASSWORD');
+        $this->username = env('GOWA_USERNAME');
+        $this->password = env('GOWA_PASSWORD');
     }
 
     /**

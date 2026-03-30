@@ -348,41 +348,43 @@ class FormSubmitController extends Controller
             );
             
             // Kirim ke GOWA
-            if ($response->form->enable_whatsapp_notification == '1') {
-                $messageResult = $this->gowaService->sendMessage(
-                    $formattedPhone,
-                    $message,
-                    $deviceId
-                );
-        
-                if ($messageResult['success']) {
-                    // Mark as sent
-                    $notifLog->update([
-                        'status' => 'sent',
-                        'sent_at' => now(),
-                    ]);
-                    
-                    Log::info('WA sent', [
-                        'response_id' => $response->id,
-                        'device_id' => $deviceId,
-                        'phone' => $formattedPhone,
-                    ]);
-                } else {
-                    // Mark as failed
-                    $errMsg = $messageResult['error'] ?? $messageResult['message'];
-                    $notifLog->update([
-                        'status' => 'failed',
-                        'error_message' => $errMsg,
-                    ]);
-                        
-                        Log::error('WA failed', [
-                            'response_id' => $response->id,
-                            'device_id' => $deviceId,
-                            'status' => $res->status(),
-                            'body' => $errMsg
-                        ]);
-                    }
-                } catch (\Exception $e) {
+                try{
+                    if ($response->form->enable_whatsapp_notification == '1') {
+                        $messageResult = $this->gowaService->sendMessage(
+                            $formattedPhone,
+                            $message,
+                            $deviceId
+                        );
+                
+                        if ($messageResult['success']) {
+                            // Mark as sent
+                            $notifLog->update([
+                                'status' => 'sent',
+                                'sent_at' => now(),
+                            ]);
+                            
+                            Log::info('WA sent', [
+                                'response_id' => $response->id,
+                                'device_id' => $deviceId,
+                                'phone' => $formattedPhone,
+                            ]);
+                        } else {
+                            // Mark as failed
+                            $errMsg = $messageResult['error'] ?? $messageResult['message'];
+                            $notifLog->update([
+                                'status' => 'failed',
+                                'error_message' => $errMsg,
+                            ]);
+                                
+                                Log::error('WA failed', [
+                                    'response_id' => $response->id,
+                                    'device_id' => $deviceId,
+                                    'status' => $res->status(),
+                                    'body' => $errMsg
+                                ]);
+                            }
+                        } 
+                }catch (\Exception $e) {
                     // Mark as failed with exception
                     $notifLog->update([
                         'status' => 'failed',
