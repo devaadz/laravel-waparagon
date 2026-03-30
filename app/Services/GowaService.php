@@ -203,7 +203,7 @@ class GowaService
     /**
      * Send WhatsApp message
      */
-    public function sendMessage(string $phone, string $message, string $deviceId = null): array
+    public function sendMessage(string $phone, string $message, ?string $deviceId = null): array
     {
         $deviceId = $deviceId ?? $this->defaultDeviceId;
 
@@ -269,7 +269,7 @@ class GowaService
     /**
      * Send WhatsApp image
      */
-    public function sendImage(string $phone, string $imagePath, string $caption = '', string $deviceId = null): array
+    public function sendImage(string $phone, string $imagePath, string $caption = '', ?string $deviceId = null): array
     {
         $deviceId = $deviceId ?? $this->defaultDeviceId;
 
