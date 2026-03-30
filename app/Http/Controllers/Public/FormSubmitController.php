@@ -518,7 +518,9 @@ class FormSubmitController extends Controller
                         ]);
                         Log::error('WA image failed', [
                             'response_id' => $response->id,
-                            'error' => $errMsg
+                            'error' => $errMsg,
+                            'status' => $response->status(),
+                            'body' => $response->body()
                         ]);
                     }
                 }
