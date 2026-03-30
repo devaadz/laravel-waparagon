@@ -11,6 +11,7 @@ use App\Models\ResponseAnswer;
 use App\Models\NotificationLog;
 use Illuminate\Http\Request;
 use App\Services\EmailService;
+use App\Services\GowaService;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -20,10 +21,12 @@ use Carbon\Carbon;
 class FormSubmitController extends Controller
 {
     protected $emailService;
+    protected $gowaService;
 
-    public function __construct(EmailService $emailService)
+    public function __construct(EmailService $emailService, GowaService $gowaService)
     {
         $this->emailService = $emailService;
+        $this->gowaService = $gowaService;
     }
 
     public function show(Request $request, Form $form)
@@ -346,65 +349,57 @@ class FormSubmitController extends Controller
             
             // Kirim ke GOWA
             if ($response->form->enable_whatsapp_notification == '1') {
-                try {
-                    $res = Http::timeout(10)
-                        ->withHeaders([
-                            'X-Device-Id' => $deviceId
-                        ])
-                        ->post(env('GOWA_URL') . '/send/message', [
-                            'phone' => $formattedPhone,
-                            'message' => $message
-                        ]);
+                $messageResult = $this->gowaService->sendMessage(
+                    $formattedPhone,
+                    $message,
+                    $deviceId
+                );
         
-                    if ($res->successful()) {
-                        // Mark as sent
-                        $notifLog->update([
-                            'status' => 'sent',
-                            'sent_at' => now(),
-                        ]);
-                        
-                        Log::info('WA sent', [
-                            'response_id' => $response->id,
-                            'device_id' => $deviceId,
-                            'phone' => $formattedPhone,
-                        ]);
-                    } else {
-                        // Mark as failed
-                        $errMsg = $res->body();
-                        $notifLog->update([
-                            'status' => 'failed',
-                            'error_message' => $errMsg,
-                        ]);
-                        
-                        Log::error('WA failed', [
-                            'response_id' => $response->id,
-                            'device_id' => $deviceId,
-                            'status' => $res->status(),
-                            'body' => $errMsg
-                        ]);
-                    }
-                } catch (\Exception $e) {
-                    // Mark as failed with exception
+                if ($messageResult['success']) {
+                    // Mark as sent
                     $notifLog->update([
-                        'status' => 'failed',
-                        'error_message' => $e->getMessage(),
+                        'status' => 'sent',
+                        'sent_at' => now(),
                     ]);
                     
-                    Log::error('WA exception', [
+                    Log::info('WA sent', [
                         'response_id' => $response->id,
-                        'error' => $e->getMessage()
+                        'device_id' => $deviceId,
+                        'phone' => $formattedPhone,
+                    ]);
+                } else {
+                    // Mark as failed
+                    $errMsg = $messageResult['error'] ?? $messageResult['message'];
+                    $notifLog->update([
+                        'status' => 'failed',
+                        'error_message' => $errMsg,
+                    ]);
+
+                    Log::error('WA failed', [
+                        'response_id' => $response->id,
+                        'device_id' => $deviceId,
+                        'error' => $errMsg
                     ]);
                 }
             }
-        } catch (\Throwable $e) {
-            Log::error('WA error', [
+        } catch (\Exception $e) {
+            // Mark as failed with exception
+            $notifLog->update([
+                'status' => 'failed',
+                'error_message' => $e->getMessage(),
+            ]);
+
+            Log::error('WA exception', [
                 'response_id' => $response->id,
                 'error' => $e->getMessage()
             ]);
         }
     }
-    private function sendEmailNotification(Response $response) { /* ... */ }
-    
+
+    private function sendEmailNotification(Response $response)
+    {
+        // Email notification logic here
+    }
 
     private function sendWhatsAppMessageWithImage(Response $response)
     {
@@ -413,43 +408,112 @@ class FormSubmitController extends Controller
             if (!$response->store || !$response->store->whatsappDevice) {
                 Log::warning('WA not sent: device not found', ['response_id' => $response->id]);
                 return;
+            }
+
+            $deviceId = $response->store->whatsappDevice->device_id;
+
+            $answers = ResponseAnswer::with('field')->where('response_id', $response->id)->get();
+            $phoneNumber = $response->whatsapp_phone;
+
+            // Jika tidak ada, cari dari field
+            if (!$phoneNumber) {
+                $phoneAnswer = ResponseAnswer::where('response_id', $response->id)
+                    ->whereHas('field', function ($q) use ($response) {
+                        $q->where('form_id', $response->form_id)
+                        ->where(function ($q2) {
+                            $q2->where('type', 'phone')
+                                ->orWhereRaw('LOWER(label) LIKE ?', ['%phone%'])
+                                ->orWhereRaw('LOWER(label) LIKE ?', ['%hp%'])
+                                ->orWhereRaw('LOWER(label) LIKE ?', ['%wa%'])
+                                ->orWhereRaw('LOWER(label) LIKE ?', ['%whatsapp%'])
+                                ->orWhereRaw('LOWER(label) LIKE ?', ['%nomor%'])
+                                ->orWhereRaw('LOWER(label) LIKE ?', ['%telepon%']);
+                        });
+                    })
+                    ->first();
+
+                if ($phoneAnswer) {
+                    $phoneNumber = $phoneAnswer->value;
                 }
-                
-                $deviceId = $response->store->whatsappDevice->device_id;
-                
-                $answers = ResponseAnswer::with('field')->where('response_id', $response->id)->get();
-                // dd("masuk ke function sendWhatsAppMessageWithImage", $response);
-                $phoneNumber = $response->whatsapp_phone;
-            
-                // Jika tidak ada, cari dari field
-                if (!$phoneNumber) {
-                    $phoneAnswer = ResponseAnswer::where('response_id', $response->id)
-                        ->whereHas('field', function ($q) use ($response) {
-                            $q->where('form_id', $response->form_id)
-                            ->where(function ($q2) {
-                                $q2->where('type', 'phone')
-                                    ->orWhereRaw('LOWER(label) LIKE ?', ['%phone%'])
-                                    ->orWhereRaw('LOWER(label) LIKE ?', ['%hp%'])
-                                    ->orWhereRaw('LOWER(label) LIKE ?', ['%wa%'])
-                                    ->orWhereRaw('LOWER(label) LIKE ?', ['%whatsapp%'])
-                                    ->orWhereRaw('LOWER(label) LIKE ?', ['%nomor%'])
-                                    ->orWhereRaw('LOWER(label) LIKE ?', ['%telepon%']);
-                            });
-                        })
-                        ->first();
-                    
-                    if ($phoneAnswer) {
-                        $phoneNumber = $phoneAnswer->value;
+            }
+
+            // Validasi nomor ada atau tidak
+            if (!$phoneNumber || empty($phoneNumber)) {
+                Log::warning('WA not sent: phone not found', [
+                    'response_id' => $response->id
+                ]);
+                return;
+            }
+
+            // Format nomor
+            $formattedPhone = $this->formatPhone($phoneNumber);
+
+            // Template dari DB dengan placeholder replacement
+            $template = $response->form->whatsapp_template ?? "New form submission received.";
+            $message = $this->replaceTemplatePlaceholders($template, $response);
+
+            if ($response->form->enable_whatsapp_image && $response->form->whatsapp_image) {
+                $imagePath = storage_path('app/public/' . $response->form->whatsapp_image);
+                if (file_exists($imagePath)) {
+                    // Determine caption based on settings
+                    $caption = '';
+                    if ($response->form->whatsapp_template_as_caption) {
+                        $caption = $message;
+                    }
+
+                    // Send image with or without caption
+                    $imageResult = $this->gowaService->sendImage(
+                        $formattedPhone,
+                        $imagePath,
+                        $caption,
+                        $deviceId
+                    );
+
+                    // Log notification for image
+                    $notifLog = NotificationLog::logNotification(
+                        $response->form_id,
+                        $response->id,
+                        'whatsapp_image',
+                        $formattedPhone,
+                        $caption ?: 'Image sent',
+                        'pending',
+                        null, // error_message
+                        $response->store->whatsappDevice->id ?? null, // whatsapp_device_id
+                        $response->store->whatsappDevice->name ?? null, // device_name
+                        $response->store->whatsappDevice->system ?? null // device_system
+                    );
+
+                    if ($imageResult['success']) {
+                        $notifLog->update([
+                            'status' => 'sent',
+                            'sent_at' => now(),
+                        ]);
+                        Log::info('WA image sent', [
+                            'response_id' => $response->id,
+                            'device_id' => $deviceId,
+                            'phone' => $formattedPhone,
+                            'has_caption' => !empty($caption)
+                        ]);
+                    } else {
+                        $errMsg = $imageResult['error'] ?? $imageResult['message'];
+                        $notifLog->update([
+                            'status' => 'failed',
+                            'error_message' => $errMsg,
+                        ]);
+                        Log::error('WA image failed', [
+                            'response_id' => $response->id,
+                            'error' => $errMsg
+                        ]);
                     }
                 }
-                
-                // Validasi nomor ada atau tidak
-                if (!$phoneNumber || empty($phoneNumber)) {
-                    Log::warning('WA not sent: phone not found', [
-                        'response_id' => $response->id
-                    ]);
-                    return;
-                }
+            }
+        } catch (\Throwable $th) {
+            Log::error('Error sending WhatsApp message with image', [
+                'response_id' => $response->id,
+                'error' => $th->getMessage()
+            ]);
+        }
+    }
                 
             // 📱 format nomor
             $formattedPhone = $this->formatPhone($phoneNumber);
@@ -469,13 +533,12 @@ class FormSubmitController extends Controller
                     }
 
                     // Send image with or without caption
-                    $res = Http::timeout(30)
-                        ->withHeaders(['X-Device-Id' => $deviceId])
-                        ->attach('image', file_get_contents($imagePath), basename($imagePath))
-                        ->post(env('GOWA_URL') . '/send/image', [
-                            'phone' => $formattedPhone,
-                            'caption' => $caption
-                        ]);
+                    $imageResult = $this->gowaService->sendImage(
+                        $formattedPhone,
+                        $imagePath,
+                        $caption,
+                        $deviceId
+                    );
 
                     // Log notification for image
                     $notifLog = NotificationLog::logNotification(
@@ -491,7 +554,7 @@ class FormSubmitController extends Controller
                         $response->store->whatsappDevice->system ?? null // device_system
                     );
 
-                    if ($res->successful()) {
+                    if ($imageResult['success']) {
                         $notifLog->update([
                             'status' => 'sent',
                             'sent_at' => now(),
@@ -503,15 +566,14 @@ class FormSubmitController extends Controller
                             'has_caption' => !empty($caption)
                         ]);
                     } else {
-                        $errMsg = $res->body();
+                        $errMsg = $imageResult['error'] ?? $imageResult['message'];
                         $notifLog->update([
                             'status' => 'failed',
                             'error_message' => $errMsg,
                         ]);
                         Log::error('WA image failed', [
                             'response_id' => $response->id,
-                            'status' => $res->status(),
-                            'body' => $errMsg
+                            'error' => $errMsg
                         ]);
                     }
                 }

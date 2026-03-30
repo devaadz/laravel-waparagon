@@ -12,11 +12,29 @@ class GowaService
 {
     protected string $baseUrl;
     protected string $defaultDeviceId;
+    protected ?string $username;
+    protected ?string $password;
 
     public function __construct()
     {
-        $this->baseUrl = config('services.gowa.url', env('GOWA_URL', 'http://localhost:3000'));
+        $this->baseUrl = config('services.gowa.url', env('GOWA_URL'));
         $this->defaultDeviceId = config('services.gowa.device_id', env('GOWA_DEVICE_ID', 'default_device'));
+        // $this->username = env('GOWA_USERNAME');
+        // $this->password = env('GOWA_PASSWORD');
+    }
+
+    /**
+     * Get HTTP client with authentication if configured
+     */
+    protected function getHttpClient()
+    {
+        $http = Http::timeout(30);
+        
+        if ($this->username && $this->password) {
+            $http = $http->withBasicAuth($this->username, $this->password);
+        }
+        
+        return $http;
     }
 
     /**
@@ -25,7 +43,7 @@ class GowaService
     public function createDevice(string $deviceId, string $name = null): array
     {
         try {
-            $response = Http::post("{$this->baseUrl}/devices", [
+            $response = $this->getHttpClient()->post("{$this->baseUrl}/devices", [
                 'device_id' => $deviceId,
             ]);
 
@@ -77,7 +95,7 @@ class GowaService
     public function getDeviceLoginQr(string $deviceId): array
     {
         try {
-            $response = Http::post("{$this->baseUrl}/api/login", [
+            $response = $this->getHttpClient()->post("{$this->baseUrl}/api/login", [
                 'device_id' => $deviceId,
             ]);
 
@@ -119,7 +137,7 @@ class GowaService
     public function getDevices(): array
     {
         try {
-            $response = Http::timeout(30)->get("{$this->baseUrl}/devices");
+            $response = $this->getHttpClient()->get("{$this->baseUrl}/devices");
 
             if ($response->successful()) {
                 $data = $response->json();
@@ -190,7 +208,7 @@ class GowaService
         $deviceId = $deviceId ?? $this->defaultDeviceId;
 
         try {
-            $response = Http::withHeaders([
+            $response = $this->getHttpClient()->withHeaders([
                 'X-Device-Id' => $deviceId,
             ])->post("{$this->baseUrl}/send/message", [
                 'phone' => $phone,
@@ -243,6 +261,74 @@ class GowaService
             return [
                 'success' => false,
                 'message' => 'Error sending message',
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Send WhatsApp image
+     */
+    public function sendImage(string $phone, string $imagePath, string $caption = '', string $deviceId = null): array
+    {
+        $deviceId = $deviceId ?? $this->defaultDeviceId;
+
+        try {
+            $response = $this->getHttpClient()->withHeaders([
+                'X-Device-Id' => $deviceId,
+            ])->attach('image', file_get_contents($imagePath), basename($imagePath))
+            ->post("{$this->baseUrl}/send/image", [
+                'phone' => $phone,
+                'caption' => $caption
+            ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+
+                // Save message to database
+                WhatsappMessage::create([
+                    'device_id' => $deviceId,
+                    'to_phone' => $phone,
+                    'text' => $caption ?: 'Image sent',
+                    'type' => 'image',
+                    'media_url' => $imagePath,
+                    'is_from_me' => true,
+                ]);
+
+                // Update or create contact
+                Contact::updateOrCreate(
+                    ['phone_number' => $phone],
+                    ['name' => null]
+                );
+
+                Log::info('Image sent successfully', [
+                    'device_id' => $deviceId,
+                    'phone' => $phone
+                ]);
+
+                return [
+                    'success' => true,
+                    'data' => $data,
+                    'message' => 'Image sent successfully'
+                ];
+            }
+
+            return [
+                'success' => false,
+                'message' => 'Failed to send image',
+                'error' => $response->body()
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Error sending image', [
+                'device_id' => $deviceId,
+                'phone' => $phone,
+                'error' => $e->getMessage()
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Error sending image',
                 'error' => $e->getMessage()
             ];
         }

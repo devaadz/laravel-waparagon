@@ -36,7 +36,7 @@ return [
     ],
 
     'gowa' => [
-        'url' => env('GOWA_URL', 'http://localhost:3000'),
+        'url' => env('GOWA_URL'),
         'device_id' => env('GOWA_DEVICE_ID', 'default_device'),
     ],
 
