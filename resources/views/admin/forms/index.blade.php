@@ -38,7 +38,6 @@
                         <a href="{{ route('admin.forms.show', $form) }}" class="text-blue-600 hover:text-blue-900 mr-2">View</a>
                         <a href="{{ route('admin.forms.edit', $form) }}" class="text-blue-600 hover:text-blue-900 mr-2">Edit</a>
                         <a href="{{ route('public.form.preview', $form) }}" target="_blank" class="text-green-600 hover:text-green-900 mr-2">Preview</a>
-                        <a href="{{ route('admin.forms.fields.index', $form) }}" class="text-green-600 hover:text-green-900 mr-2">Fields</a>
                         <form method="POST" action="{{ route('admin.forms.destroy', $form->id) }}" class="inline">
                             @csrf
                             @method('DELETE')

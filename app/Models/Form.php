@@ -33,7 +33,7 @@ protected $fillable = [
 
     protected $casts = [
         'enable_email_notification' => 'boolean',
-'enable_whatsapp_notification' => 'boolean',
+        'enable_whatsapp_notification' => 'boolean',
         'enable_whatsapp_image' => 'boolean',
         'whatsapp_template_as_caption' => 'boolean',
     ];

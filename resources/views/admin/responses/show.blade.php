@@ -40,7 +40,20 @@
                 @foreach($response->answers as $answer)
                 <div class="border border-gray-200 rounded p-4">
                     <h4 class="font-semibold text-gray-700">{{ $answer->field->label }}</h4>
-                    <p class="text-gray-900">{{ $answer->value }}</p>
+                    <p class="text-gray-900">
+                        @if($answer->field->type === 'checkbox' && $answer->value)
+                            @php
+                                $values = json_decode($answer->value, true);
+                                if (is_array($values)) {
+                                    echo implode(', ', $values);
+                                } else {
+                                    echo $answer->value;
+                                }
+                            @endphp
+                        @else
+                            {{ $answer->value }}
+                        @endif
+                    </p>
                 </div>
                 @endforeach
             </div>

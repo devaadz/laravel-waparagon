@@ -16,7 +16,7 @@ return new class extends Migration
             $table->uuid('form_id');
             $table->foreign('form_id')->references('id')->on('forms')->onDelete('cascade');
             $table->string('label');
-            $table->enum('type', ['text', 'number', 'date', 'radio', 'select', 'textarea', 'email', 'tel']);
+            $table->enum('type', ['text', 'number', 'date', 'radio', 'select', 'textarea', 'email', 'tel', 'checkbox']);
             $table->string('placeholder')->nullable();
             $table->boolean('required')->default(false);
             $table->json('options')->nullable(); // for radio/select options

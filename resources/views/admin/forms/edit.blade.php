@@ -259,8 +259,11 @@
                             <option value="tel" {{ old('fields.' . $index . '.type', $field->type) === 'tel' ? 'selected' : '' }}>Phone</option>
                             <option value="date" {{ old('fields.' . $index . '.type', $field->type) === 'date' ? 'selected' : '' }}>Date</option>
                             <option value="textarea" {{ old('fields.' . $index . '.type', $field->type) === 'textarea' ? 'selected' : '' }}>Textarea</option>
+                            
                             <option value="radio" {{ old('fields.' . $index . '.type', $field->type) === 'radio' ? 'selected' : '' }}>Radio</option>
+                            <option value="checkbox" {{ old('fields.' . $index . '.type', $field->type) === 'checkbox' ? 'selected' : '' }}>Checkbox</option>
                             <option value="select" {{ old('fields.' . $index . '.type', $field->type) === 'select' ? 'selected' : '' }}>Dropdown</option>
+
                         </select>
                     </div>
                     <div>
@@ -284,10 +287,10 @@
                     </div>
                 </div>
 
-                <div class="options-container" style="{{ in_array($field->type, ['radio', 'select']) ? '' : 'display: none;' }}" class="bg-gradient-to-r from-gray-50 to-slate-50 p-6 rounded-xl border-2 border-dashed border-gray-300">
+                <div class="options-container" style="{{ in_array($field->type, ['radio', 'select', 'checkbox']) ? '' : 'display: none;' }}" class="bg-gradient-to-r from-gray-50 to-slate-50 p-6 rounded-xl border-2 border-dashed border-gray-300">
                     <label class="block text-lg font-bold text-gray-800 mb-4">Options (one per line)</label>
-                    <textarea name="fields[{{ $index }}][options_text]" rows="4" class="w-full px-5 py-4 border border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-200 focus:border-purple-400 transition-all duration-300 shadow-sm resize-vertical">{{ old('fields.' . $index . '.options_text', is_array($field->options) ? implode("\n", $field->options) : '') }}</textarea>
-                    <input type="hidden" name="fields[{{ $index }}][options]" value="{{ old('fields.' . $index . '.options', json_encode($form->options)) }}">
+                    <textarea name="fields[{{ $index }}][options_text]" rows="4" class="w-full px-5 py-4 border border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-200 focus:border-purple-400 transition-all duration-300 shadow-sm resize-vertical">{{ old('fields.' . $index . '.options_text', is_array($field->options) ? implode("\n", $field->options) : (is_string($field->options) ? implode("\n", json_decode($field->options, true) ?? []) : '')) }}</textarea>
+                    <input type="hidden" name="fields[{{ $index }}][options]" value="{{ old('fields.' . $index . '.options', json_encode(is_array($field->options) ? $field->options : json_decode($field->options, true) ?? [])) }}">
                 </div>
             </div>
             @endforeach
@@ -388,7 +391,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.target.classList.contains('field-type')) {
             const container = e.target.closest('.field-item');
             const optionsContainer = container.querySelector('.options-container');
-            if (['radio', 'select'].includes(e.target.value)) {
+            if (['radio', 'select','checkbox'].includes(e.target.value)) {
                 optionsContainer.style.display = 'block';
             } else {
                 optionsContainer.style.display = 'none';
@@ -433,6 +436,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <option value="date">Date</option>
                             <option value="textarea">Textarea</option>
                             <option value="radio">Radio</option>
+                            <option value="checkbox">Checkbox</option>
                             <option value="select">Dropdown</option>
                         </select>
                     </div>

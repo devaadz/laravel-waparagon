@@ -115,8 +115,18 @@
                         <span class="ml-2">{{ $option }}</span>
                     </label>
                 </div>
-            @endforeach
-        @elseif($field->type === 'select' && $field->options)
+            @endforeach        @elseif($field->type === 'checkbox' && $field->options)
+            @php $options = is_string($field->options) ? json_decode($field->options, true) : $field->options @endphp
+            @foreach($options as $option)
+                <div class="mb-2">
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" name="field_{{ $field->id }}[]" value="{{ $option }}"
+                               {{ in_array($option, old("field_{$field->id}", [])) ? 'checked' : '' }}
+                               class="form-checkbox">
+                        <span class="ml-2">{{ $option }}</span>
+                    </label>
+                </div>
+            @endforeach        @elseif($field->type === 'select' && $field->options)
             @php $options = is_string($field->options) ? json_decode($field->options, true) : $field->options @endphp
             <select name="field_{{ $field->id }}" id="field_{{ $field->id }}"
                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"

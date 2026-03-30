@@ -93,15 +93,15 @@ class FormSubmitController extends Controller
         try {
             $response->load(['store.whatsappDevice', 'form']);
 
-            if ($response->form->enable_email_notification) {
+            if ($response->form->enable_email_notification == '1' ) {
                 $this->sendEmailNotification($response);
             }
 
-            if ($response->form->enable_whatsapp_notification) {
+            if ($response->form->enable_whatsapp_notification == '1') {
                 $this->sendWhatsAppMessage($response);
             }
 
-            if ($response->form->enable_whatsapp_image) {
+            if ($response->form->enable_whatsapp_image == '1') {
                 $this->sendWhatsAppMessageWithImage($response);
             }
         } catch (\Throwable $e) {

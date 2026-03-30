@@ -111,6 +111,10 @@ class FormSubmitController extends Controller
             foreach ($form->fields as $field) {
                 $value = $request->input("field_{$field->id}");
                 if ($value !== null) {
+                    // Handle array values (like checkboxes)
+                    if (is_array($value)) {
+                        $value = json_encode($value);
+                    }
                     ResponseAnswer::create([
                         'response_id' => $response->id,
                         'field_id' => $field->id,
@@ -230,6 +234,10 @@ class FormSubmitController extends Controller
         foreach ($form->fields as $field) {
             $value = $request->input("field_{$field->id}");
             if ($value !== null) {
+                // Handle array values (like checkboxes)
+                if (is_array($value)) {
+                    $value = json_encode($value);
+                }
                 ResponseAnswer::create([
                     'response_id' => $response->id,
                     'field_id' => $field->id,
@@ -376,12 +384,11 @@ class FormSubmitController extends Controller
                                 'error_message' => $errMsg,
                             ]);
                                 
-                                Log::error('WA failed', [
-                                    'response_id' => $response->id,
-                                    'device_id' => $deviceId,
-                                    'status' => $res->status(),
-                                    'body' => $errMsg
-                                ]);
+                            Log::error('WA failed', [
+                                'response_id' => $response->id,
+                                'device_id' => $deviceId,
+                                'body' => $errMsg
+                            ]);
                             }
                         } 
                 }catch (\Exception $e) {

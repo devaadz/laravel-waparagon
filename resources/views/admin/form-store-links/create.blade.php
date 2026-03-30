@@ -25,7 +25,7 @@
                 <!-- Forms -->
                 <div class="group">
                     <label class="block text-3xl font-black text-gray-900 mb-8">
-                        Choose Form
+                        📋 Choose Form
                     </label>
                     <div class="relative">
                         <select name="form_id" id="form_select" required 
@@ -96,7 +96,7 @@
             <!-- Live Preview (Hidden initially) -->
             <div id="preview-panel" class="hidden bg-white/90 backdrop-blur-2xl rounded-4xl shadow-4xl p-12 border border-white/50 mb-20">
                 <div class="text-center mb-16">
-                    <h2 class="text-5xl font-black bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent mb-6">Link Ready!</h2>
+                    <h2 class="text-5xl font-black bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent mb-6">✅ Link Ready!</h2>
                     <p class="text-3xl text-gray-700 font-light mb-12">Your customers can fill this form now</p>
                 </div>
 
@@ -114,7 +114,7 @@
                                 <input type="text" id="live-url" readonly 
                                        class="w-full bg-black/50 backdrop-blur-md px-12 py-8 text-3xl font-mono rounded-4xl border-4 border-white/30 text-white focus:outline-none focus:border-white/50 shadow-2xl" value="">
                                 <button type="button" id="copy-live-url" class="absolute right-6 top-1/2 -translate-y-1/2 bg-white/30 hover:bg-white/50 text-white px-8 py-4 rounded-3xl font-bold text-xl transition-all duration-300 shadow-lg">
-                                    Copy
+                                    📋 Copy
                                 </button>
                             </div>
                             <div class="flex gap-6 justify-center">
@@ -139,10 +139,10 @@
                             </div>
                             <div class="flex gap-4 justify-center flex-wrap">
                                 <a href="#" id="download-qr" download class="px-12 py-6 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-500 flex items-center gap-3">
-                                    Download PNG
+                                    ⬇️ Download PNG
                                 </a>
                                 <button type="button" id="print-qr" class="px-12 py-6 bg-gradient-to-r from-gray-600 to-slate-700 text-white font-bold rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-500 flex items-center gap-3">
-                                    Print
+                                    🖨️ Print
                                 </button>
                             </div>
                         </div>
@@ -188,10 +188,10 @@ document.addEventListener('DOMContentLoaded', function() {
     formSelect.addEventListener('change', toggleButton);
     storeSelect.addEventListener('change', toggleButton);
 
-    document.getElementById('copy-live-url').onclick = function() {
+    document.getElementById('copy-live-url').onclick = () => {
         navigator.clipboard.writeText(document.getElementById('live-url').value);
-        this.textContent = 'Copied!';
-        setTimeout(() => this.textContent = 'Copy', 2000);
+        this.textContent = '✅ Copied!';
+        setTimeout(() => this.textContent = '📋 Copy', 2000);
     };
 
     // QR generation on form submit success (AJAX-ready)
