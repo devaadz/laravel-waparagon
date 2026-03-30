@@ -8,18 +8,20 @@ use App\Http\Controllers\Admin\FieldController;
 use App\Http\Controllers\Admin\WhatsappMessageController;
 use App\Http\Controllers\Admin\WhatsappDeviceController;
 use App\Http\Controllers\Admin\ResponseController;
+use App\Http\Controllers\Admin\NotificationLogController;
 use App\Http\Controllers\Public\FormSubmitController;
 use App\Http\Controllers\Webhook\GoWAWebhookController;
 // use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Http\Controllers\PublicFormController;
 
+
+Route::get('/form/{slug}/qr/download', [PublicFormController::class, 'downloadQr'])
+->name('public.form.store.qr.download');
+
 Route::get('/form/{slug}/qr', [PublicFormController::class, 'qr'])
     ->name('public.form.store.qr');
 
-Route::get('/form/{slug}/qr/download', [PublicFormController::class, 'downloadQr'])
-    ->name('public.form.store.qr.download');
-
-Route::get('/', function () {
+    Route::get('/', function () {
     return view('welcome');
 });
 
@@ -42,11 +44,17 @@ Route::resource('forms', FormController::class);
     Route::match(['get', 'post'], 'responses/export', [ResponseController::class, 'export'])->name('responses.export');
     Route::resource('responses', ResponseController::class)->only(['index', 'show']);
     Route::resource('whatsapp', WhatsappMessageController::class)->only(['index', 'show', 'destroy']);
+    Route::get('whatsapp-export', [WhatsappMessageController::class, 'export'])->name('whatsapp.export');
     Route::resource('devices', WhatsappDeviceController::class)->except(['edit', 'update']);
     Route::get('devices/{device}/login', [WhatsappDeviceController::class, 'login'])->name('devices.login');
     Route::post('devices/sync', [WhatsappDeviceController::class, 'sync'])->name('devices.sync');
     Route::post('devices/{device}/link-store', [WhatsappDeviceController::class, 'linkToStore'])->name('devices.link-store');
     Route::post('devices/{device}/unlink-store', [WhatsappDeviceController::class, 'unlinkFromStore'])->name('devices.unlink-store');
+    
+    // Notification Logs
+    Route::resource('notification-logs', NotificationLogController::class)->only(['index', 'show']);
+    Route::get('notification-logs-export', [NotificationLogController::class, 'export'])->name('notification-logs.export');
+    Route::post('notification-logs/{log}/retry', [NotificationLogController::class, 'retry'])->name('notification-logs.retry');
 });
 
 // Public routes - store-specific URL (e.g., /form/survey-form-toko-a)

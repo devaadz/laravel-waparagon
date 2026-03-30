@@ -34,7 +34,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-end mb-16">
                 <!-- Forms Dropdown -->
                 <div>
-                    <label class="block text-2xl font-bold text-gray-800 mb-6">📋 Select Form</label>
+                    <label class="block text-2xl font-bold text-gray-800 mb-6">Select Form</label>
                     <div class="relative">
                         <select name="form_id" id="form_select" required class="w-full px-8 py-6 text-xl font-bold border-2 border-gray-200 rounded-3xl focus:ring-8 focus:ring-blue-200 focus:border-blue-500 transition-all duration-500 shadow-xl hover:shadow-2xl appearance-none bg-white cursor-pointer">
                             <option value="">Choose a form...</option>
@@ -104,7 +104,7 @@
                             </div>
                             <div class="relative">
                                 <input type="text" id="preview-url" readonly class="w-full bg-black/30 backdrop-blur-md px-8 py-6 text-2xl font-mono rounded-2xl border-2 border-white/20 text-white focus:outline-none focus:border-white/50 transition-all duration-300" value="">
-                                <button type="button" id="copy-url" class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white px-6 py-3 rounded-xl font-bold text-lg transition-all duration-300">📋 Copy</button>
+                                <button type="button" id="copy-url" class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white px-6 py-3 rounded-xl font-bold text-lg transition-all duration-300">Copy</button>
                             </div>
                         </div>
                     </div>
@@ -128,7 +128,7 @@
                             </div>
                             <div class="flex gap-3 mt-8 justify-center">
                                 <a href="#" id="qr-download" download class="px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center gap-3">
-                                    ⬇️ Download QR
+                                    Download QR
                                 </a>
                             </div>
                         </div>
@@ -138,7 +138,7 @@
                 <!-- Action Buttons -->
                 <div class="text-center mt-16 p-8 bg-white/50 backdrop-blur-md rounded-3xl shadow-xl border border-white/50">
                     <button type="submit" id="save-link" class="bg-gradient-to-r from-emerald-600 via-green-600 to-emerald-700 hover:from-emerald-700 hover:via-green-700 hover:to-emerald-800 text-white font-black text-2xl px-16 py-8 rounded-3xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-2 transition-all duration-500 flex items-center gap-4 mx-auto">
-                        ✅ Create This Link!
+                        Create This Link!
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                         </svg>
@@ -155,7 +155,7 @@
                         </svg>
                     </div>
                     <div>
-                        <h2 class="text-4xl font-black text-gray-900 mb-3">✅ Existing Links</h2>
+                        <h2 class="text-4xl font-black text-gray-900 mb-3">Existing Links</h2>
                         <p class="text-xl text-gray-600">All current form-store connections</p>
                     </div>
                 </div>
@@ -249,8 +249,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Copy URL
     document.getElementById('copy-url').addEventListener('click', function() {
         navigator.clipboard.writeText(document.getElementById('preview-url').value);
-        this.textContent = '✅ Copied!';
-        setTimeout(() => this.textContent = '📋 Copy', 2000);
+        this.textContent = 'Copied!';
+        setTimeout(() => this.textContent = 'Copy', 2000);
     });
 });
 </script>

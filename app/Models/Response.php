@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Response extends Model
 {
-    protected $fillable = ['form_id', 'store_id', 'email'];
+    protected $fillable = ['form_id', 'store_id', 'email', 'whatsapp_phone'];
 
     public function form()
     {
@@ -21,6 +21,11 @@ class Response extends Model
     public function answers()
     {
         return $this->hasMany(ResponseAnswer::class);
+    }
+
+    public function notification_logs()
+    {
+        return $this->hasMany(NotificationLog::class);
     }
     
 }

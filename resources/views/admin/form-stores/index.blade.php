@@ -16,7 +16,10 @@
                 Stores
             </a>
             <a href="{{ route('admin.form-stores.create') }}" class="bg-emerald-500 hover:bg-emerald-700 text-white font-bold py-2 px-6 rounded-xl shadow-lg">
-                ➕ Create Link
+                <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Create Link
             </a>
         </div>
     </div>

@@ -4,14 +4,14 @@
 <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-2xl p-8 text-white mb-8">
     <div class="flex justify-between items-center">
         <div>
-            <h1 class="text-4xl font-bold">✏️ Edit Form</h1>
+            <h1 class="text-4xl font-bold">Edit Form</h1>
             <p class="text-blue-100 mt-2">Configure your form settings, notifications, and fields</p>
         </div>
         <div class="flex gap-3">
             <a href="{{ route('admin.forms.index') }}" class="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white font-bold py-3 px-6 rounded-xl transition-all duration-300">
                 ← All Forms
             </a>
-            <a href="{{ route('admin.forms.stores', $form) }}" class="bg-white hover:bg-white/90 text-blue-600 font-bold py-3 px-6 rounded-xl shadow-lg transition-all duration-300">
+            <a href="{{ route('admin.form-stores.index') }}" class="bg-white hover:bg-white/90 text-blue-600 font-bold py-3 px-6 rounded-xl shadow-lg transition-all duration-300">
                 🔗 Link Stores
             </a>
         </div>
@@ -25,7 +25,7 @@
     <!-- Basic Info -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div class="bg-white rounded-2xl shadow-lg p-8">
-            <h3 class="text-2xl font-bold mb-6 text-gray-800 border-b-2 border-blue-100 pb-4">📝 Basic Information</h3>
+            <h3 class="text-2xl font-bold mb-6 text-gray-800 border-b-2 border-blue-100 pb-4">Basic Information</h3>
             
             <div class="space-y-6">
                 <div>
@@ -96,7 +96,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.27 4.31c.912.543 2.46.543 3.372 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                         </svg>
                     </div>
-                    <h3 class="text-2xl font-bold ml-4 text-gray-800">📧 Email Notifications</h3>
+                    <h3 class="text-2xl font-bold ml-4 text-gray-800">Email Notifications</h3>
                 </div>
 
                 <div class="space-y-5">
@@ -139,7 +139,7 @@
                             <path d="M4 2a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V4a2 2 0 00-2-2H4zm0 1h16v12H4V3z"></path>
                         </svg>
                     </div>
-                    <h3 class="text-2xl font-bold ml-4 text-gray-800">📱 WhatsApp Notifications</h3>
+                    <h3 class="text-2xl font-bold ml-4 text-gray-800">WhatsApp Notifications</h3>
                 </div>
 
                 <div class="space-y-5">
@@ -148,54 +148,75 @@
                         <span class="ml-4 text-lg font-semibold text-gray-800">Send WhatsApp to store device</span>
                     </div>
 
-                    <div>
-                        <label for="whatsapp_template" class="block text-sm font-semibold text-gray-700 mb-3">Message Template</label>
-                        <textarea name="whatsapp_template" id="whatsapp_template" rows="5" 
-                                  placeholder="Halo! *{form_name}* terisi dari {store_name} 👋..." 
-                                  class="w-full px-5 py-4 border border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 shadow-sm resize-vertical">{{ old('whatsapp_template', $form->whatsapp_template) }}</textarea>
-                        <p class="text-xs text-gray-500 mt-2">Variables: <code class="bg-gray-100 px-2 py-1 rounded">{form_name}</code> <code>{email}</code> <code>{store_name}</code> <code>{admin_url}</code></p>
-                    </div>
+                    <div id="whatsapp-notification-fields" class="space-y-5">
+                        <div>
+                            <label for="whatsapp_template" class="block text-sm font-semibold text-gray-700 mb-3">Message Template</label>
+                            <textarea name="whatsapp_template" id="whatsapp_template" rows="5" 
+                                      placeholder="Halo! *{customer_name}* terisi dari {store_name}..." 
+                                      class="w-full px-5 py-4 border border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-200 focus:border-indigo-400 transition-all duration-300 shadow-sm resize-vertical">{{ old('whatsapp_template', $form->whatsapp_template) }}</textarea>
+                            <p class="text-xs text-gray-500 mt-2">Variables: <code class="bg-gray-100 px-2 py-1 rounded">{customer_name}</code> <code>{email}</code> <code>{store_name}</code> <code>{form_name}</code><code>{submission_data}</code></p>
+                        </div>
 
-                    <div>
-                        <label class="flex items-center p-3 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border">
-                            <input type="checkbox" name="enable_whatsapp_image" value="1" id="enable_whatsapp_image" {{ old('enable_whatsapp_image', $form->enable_whatsapp_image) ? 'checked' : '' }} class="w-5 h-5 text-orange-600 border-gray-300 rounded focus:ring-orange-500">
-                            <span class="ml-4 font-semibold text-gray-800">📸 Send image with WhatsApp</span>
-                        </label>
-                    </div>
+                        <div>
+                            <label class="flex items-center p-3 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border">
+                                <input type="checkbox" name="enable_whatsapp_image" value="1" id="enable_whatsapp_image" {{ old('enable_whatsapp_image', $form->enable_whatsapp_image) ? 'checked' : '' }} class="w-5 h-5 text-orange-600 border-gray-300 rounded focus:ring-orange-500">
+                                <span class="ml-4 font-semibold text-gray-800">
+                                    <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                    Send image with WhatsApp
+                                </span>
+                            </label>
+                        </div>
 
-                    <div id="whatsapp-image-section" style="display: {{ old('enable_whatsapp_image', $form->enable_whatsapp_image) ? 'block' : 'none' }};" class="mt-4 p-5 bg-white rounded-xl shadow-sm border-2 border-dashed border-orange-200 hover:border-orange-400 transition-colors">
-                        <label for="whatsapp_image" class="block text-sm font-semibold text-gray-700 mb-4">🖼️ Notification Image (Max 5MB)</label>
-                        
-                        <div class="space-y-4">
-                            <input type="file" name="whatsapp_image" id="whatsapp_image" accept="image/*" class="w-full px-5 py-4 border-2 border-dashed border-gray-300 rounded-xl focus:ring-4 focus:ring-orange-200 focus:border-orange-400 transition-all duration-300 cursor-pointer hover:bg-orange-50 file:mr-5 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700">
+                        <div id="whatsapp-image-section" style="display: {{ old('enable_whatsapp_image', $form->enable_whatsapp_image) ? 'block' : 'none' }};" class="mt-4 p-5 bg-white rounded-xl shadow-sm border-2 border-dashed border-orange-200 hover:border-orange-400 transition-colors">
+                            <label for="whatsapp_image" class="block text-sm font-semibold text-gray-700 mb-4">
+                                <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                Notification Image (Max 5MB)
+                            </label>
                             
-                            @if($form->whatsapp_image)
-                            <div class="text-center">
-                                <img src="{{ $form->whatsapp_image_url ?? asset('storage/' . $form->whatsapp_image) }}" alt="Current image" class="mx-auto max-w-xs max-h-48 object-cover rounded-2xl shadow-lg ring-4 ring-orange-100 hover:ring-orange-200 transition-all duration-300 cursor-zoom-in mx-auto">
-                                <div class="flex justify-center items-center gap-4 mt-3">
-                                    <label class="inline-flex items-center bg-red-100 hover:bg-red-200 text-red-800 font-semibold py-2 px-4 rounded-xl cursor-pointer transition-all duration-300">
-                                        <input type="checkbox" name="delete_whatsapp_image" value="1" id="delete_whatsapp_image" class="form-checkbox">
-                                        <span class="ml-2">🗑️ Delete</span>
-                                    </label>
+                            <div class="space-y-4">
+                                <input type="file" name="whatsapp_image" id="whatsapp_image" accept="image/*" class="w-full px-5 py-4 border-2 border-dashed border-gray-300 rounded-xl focus:ring-4 focus:ring-orange-200 focus:border-orange-400 transition-all duration-300 cursor-pointer hover:bg-orange-50 file:mr-5 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700">
+                                
+                                @if($form->whatsapp_image)
+                                <div class="text-center">
+                                    <img src="{{ $form->whatsapp_image_url ?? asset('storage/' . $form->whatsapp_image) }}" alt="Current image" class="mx-auto max-w-xs max-h-48 object-cover rounded-2xl shadow-lg ring-4 ring-orange-100 hover:ring-orange-200 transition-all duration-300 cursor-zoom-in mx-auto">
+                                    <div class="flex justify-center items-center gap-4 mt-3">
+                                        <label class="inline-flex items-center bg-red-100 hover:bg-red-200 text-red-800 font-semibold py-2 px-4 rounded-xl cursor-pointer transition-all duration-300">
+                                            <input type="checkbox" name="delete_whatsapp_image" value="1" id="delete_whatsapp_image" class="form-checkbox">
+                                            <span class="ml-2">🗑️ Delete</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                @endif
+                                
+                                <div id="image-preview" class="mt-4 p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl border-2 border-dashed border-orange-200 hidden">
+                                    <img id="image-preview-img" src="" class="max-w-full max-h-64 object-cover rounded-2xl shadow-lg ring-4 ring-orange-100 hover:scale-105 transition-all duration-500 cursor-pointer mx-auto">
                                 </div>
                             </div>
-                            @endif
                             
-                            <div id="image-preview" class="mt-4 p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl border-2 border-dashed border-orange-200 hidden">
-                                <img id="image-preview-img" src="" class="max-w-full max-h-64 object-cover rounded-2xl shadow-lg ring-4 ring-orange-100 hover:scale-105 transition-all duration-500 cursor-pointer mx-auto">
-                            </div>
+                            <p class="text-xs text-gray-500 mt-4 text-center italic">PNG, JPG, GIF, WEBP • Max 5MB • Auto preview</p>
+                            
+                            @error('whatsapp_image')
+                                <p class="text-red-500 text-sm mt-2 flex items-center justify-center">
+                                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    {{ $message }}
+                                </p>
+                            @enderror
                         </div>
-                        
-                        <p class="text-xs text-gray-500 mt-4 text-center italic">PNG, JPG, GIF, WEBP • Max 5MB • Auto preview</p>
-                        
-                        @error('whatsapp_image')
-                            <p class="text-red-500 text-sm mt-2 flex items-center justify-center">
-                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-                                </svg>
-                                {{ $message }}
-                            </p>
-                        @enderror
+
+                        <div>
+                            <label class="flex items-center p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border">
+                                <input type="checkbox" name="whatsapp_template_as_caption" value="1" id="whatsapp_template_as_caption" {{ old('whatsapp_template_as_caption', $form->whatsapp_template_as_caption) ? 'checked' : '' }} class="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
+                                <span class="ml-4 font-semibold text-gray-800">Use message template as image caption</span>
+                            </label>
+                            <p class="text-xs text-gray-500 mt-2 ml-8">If enabled, the message template will be used as the image caption instead of sending a separate text message.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -232,14 +253,14 @@
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-3">Type</label>
                         <select name="fields[{{ $index }}][type]" class="field-type w-full px-5 py-4 border border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-200 focus:border-blue-400 transition-all duration-300 shadow-sm" required>
-                            <option value="text" {{ old('fields.' . $index . '.type', $field->type) === 'text' ? 'selected' : '' }}>📝 Text</option>
-                            <option value="number" {{ old('fields.' . $index . '.type', $field->type) === 'number' ? 'selected' : '' }}>🔢 Number</option>
-                            <option value="email" {{ old('fields.' . $index . '.type', $field->type) === 'email' ? 'selected' : '' }}>✉️ Email</option>
-                            <option value="tel" {{ old('fields.' . $index . '.type', $field->type) === 'tel' ? 'selected' : '' }}>📱 Phone</option>
-                            <option value="date" {{ old('fields.' . $index . '.type', $field->type) === 'date' ? 'selected' : '' }}>📅 Date</option>
-                            <option value="textarea" {{ old('fields.' . $index . '.type', $field->type) === 'textarea' ? 'selected' : '' }}>📄 Textarea</option>
-                            <option value="radio" {{ old('fields.' . $index . '.type', $field->type) === 'radio' ? 'selected' : '' }}>🔘 Radio</option>
-                            <option value="select" {{ old('fields.' . $index . '.type', $field->type) === 'select' ? 'selected' : '' }}>⬇️ Dropdown</option>
+                            <option value="text" {{ old('fields.' . $index . '.type', $field->type) === 'text' ? 'selected' : '' }}>Text</option>
+                            <option value="number" {{ old('fields.' . $index . '.type', $field->type) === 'number' ? 'selected' : '' }}>Number</option>
+                            <option value="email" {{ old('fields.' . $index . '.type', $field->type) === 'email' ? 'selected' : '' }}>Email</option>
+                            <option value="tel" {{ old('fields.' . $index . '.type', $field->type) === 'tel' ? 'selected' : '' }}>Phone</option>
+                            <option value="date" {{ old('fields.' . $index . '.type', $field->type) === 'date' ? 'selected' : '' }}>Date</option>
+                            <option value="textarea" {{ old('fields.' . $index . '.type', $field->type) === 'textarea' ? 'selected' : '' }}>Textarea</option>
+                            <option value="radio" {{ old('fields.' . $index . '.type', $field->type) === 'radio' ? 'selected' : '' }}>Radio</option>
+                            <option value="select" {{ old('fields.' . $index . '.type', $field->type) === 'select' ? 'selected' : '' }}>Dropdown</option>
                         </select>
                     </div>
                     <div>
@@ -274,13 +295,15 @@
         
         <div class="flex gap-4">
             <button type="button" id="add-field" class="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-4 px-8 rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300">
-                ➕ Add New Field
+                <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg> Add New Field
             </button>
             <button type="submit" class="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold py-4 px-12 rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 flex items-center gap-3">
-                💾 Update Form
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
                 </svg>
+                Update Form
             </button>
         </div>
     </div>
@@ -289,11 +312,34 @@
         ← Cancel & Back to Forms
     </a>
 </form>
+@endsection
 
 @section('script')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     let fieldIndex = {{ $form->fields->count() }};
+
+    // WhatsApp notification toggle - Main checkbox
+    const enableWhatsappNotification = document.querySelector('input[name="enable_whatsapp_notification"]');
+    const whatsappNotificationFields = document.getElementById('whatsapp-notification-fields');
+    
+    function toggleWhatsappFields() {
+        const isEnabled = enableWhatsappNotification.checked;
+        whatsappNotificationFields.style.display = isEnabled ? 'block' : 'none';
+    }
+    
+    // Initial state
+    toggleWhatsappFields();
+    
+    // Listen to checkbox change
+    enableWhatsappNotification.addEventListener('change', function() {
+        toggleWhatsappFields();
+        // Jika disable, reset juga image checkbox
+        if (!this.checked) {
+            document.getElementById('enable_whatsapp_image').checked = false;
+            document.getElementById('whatsapp_image-section').style.display = 'none';
+        }
+    });
 
     // WhatsApp image functionality
     const enableWhatsappImage = document.getElementById('enable_whatsapp_image');
@@ -380,14 +426,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-3">Type</label>
                         <select name="fields[${fieldIndex}][type]" class="field-type w-full px-5 py-4 border border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-200 focus:border-blue-400 transition-all duration-300 shadow-sm" required>
-                            <option value="text">📝 Text</option>
-                            <option value="number">🔢 Number</option>
-                            <option value="email">✉️ Email</option>
-                            <option value="tel">📱 Phone</option>
-                            <option value="date">📅 Date</option>
-                            <option value="textarea">📄 Textarea</option>
-                            <option value="radio">🔘 Radio</option>
-                            <option value="select">⬇️ Dropdown</option>
+                            <option value="text">Text</option>
+                            <option value="number">Number</option>
+                            <option value="email">Email</option>
+                            <option value="tel">Phone</option>
+                            <option value="date">Date</option>
+                            <option value="textarea">Textarea</option>
+                            <option value="radio">Radio</option>
+                            <option value="select">Dropdown</option>
                         </select>
                     </div>
                     <div>

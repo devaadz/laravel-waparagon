@@ -51,11 +51,22 @@ class FormController extends Controller
             'slug' => Str::slug($request->name),
             'description' => $request->description,
             'status' => $request->status,
+            'language' => 'id', // Default language
         ]);
         
-        return redirect()->route('admin.forms.index')->with('success', 'Form created successfully.');
+        // Auto-create 4 default fields
+        $defaultFields = [
+            ['label' => 'Nama', 'type' => 'text', 'placeholder' => 'Masukkan nama Anda', 'required' => true, 'sort_order' => 1],
+            ['label' => 'Email', 'type' => 'email', 'placeholder' => 'contoh@email.com', 'required' => true, 'sort_order' => 2],
+            ['label' => 'Nomor WhatsApp', 'type' => 'tel', 'placeholder' => '812345678 (tanpa 0)', 'required' => true, 'sort_order' => 3],
+            ['label' => 'Pesan', 'type' => 'textarea', 'placeholder' => 'Tuliskan pesan Anda...', 'required' => false, 'sort_order' => 4],
+        ];
 
-
+        foreach ($defaultFields as $field) {
+            FormField::create(array_merge($field, ['form_id' => $form->id]));
+        }
+        
+        return redirect()->route('admin.forms.edit', $form)->with('success', 'Form created successfully with default fields.');
     }
 
     /**
@@ -131,6 +142,7 @@ class FormController extends Controller
 
             'enable_whatsapp_image' => $request->boolean('enable_whatsapp_image'),
             'whatsapp_image' => $imagePath,
+            'whatsapp_template_as_caption' => $request->boolean('whatsapp_template_as_caption'),
         ]);
 
         // =========================

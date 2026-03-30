@@ -9,8 +9,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('forms', function (Blueprint $table) {
-            $table->boolean('enable_whatsapp_image')->default(false)->after('whatsapp_template');
-            $table->string('whatsapp_image')->nullable()->after('enable_whatsapp_image');
+            if (!Schema::hasColumn('forms', 'enable_whatsapp_image')) {
+                $table->boolean('enable_whatsapp_image')->default(false)->after('whatsapp_template');
+            }
+            if (!Schema::hasColumn('forms', 'whatsapp_image')) {
+                $table->string('whatsapp_image')->nullable()->after('enable_whatsapp_image');
+            }
         });
     }
 

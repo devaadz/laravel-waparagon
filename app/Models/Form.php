@@ -20,7 +20,10 @@ protected $fillable = [
         'enable_whatsapp_notification',
         'whatsapp_template',
         'enable_whatsapp_image',
-        'whatsapp_image'
+        'whatsapp_image',
+        'whatsapp_template_as_caption',
+        'privacy_policy',
+        'language'
     ];
 
     public function getRouteKeyName()
@@ -32,6 +35,7 @@ protected $fillable = [
         'enable_email_notification' => 'boolean',
 'enable_whatsapp_notification' => 'boolean',
         'enable_whatsapp_image' => 'boolean',
+        'whatsapp_template_as_caption' => 'boolean',
     ];
 
     public function fields()
@@ -52,6 +56,11 @@ protected $fillable = [
     public function stores()
     {
         return $this->belongsToMany(Store::class, 'form_stores');
+    }
+
+    public function notification_logs()
+    {
+        return $this->hasMany(NotificationLog::class);
     }
 
     // Get store-specific slug (helper)

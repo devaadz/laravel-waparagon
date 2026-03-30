@@ -55,15 +55,6 @@ class WhatsappDeviceController extends Controller
     public function sync()
     {
         $result = $this->gowaService->getDevices();
-        // dd($result);
-
-        // if ($result['success']) {
-        //     return redirect()->route('admin.devices.index')
-        //         ->with('success', $result['message']);
-        // }
-
-        // return redirect()->route('admin.devices.index')
-        //     ->with('error', $result['message']);
 
         if (!$result['success']) {
             return redirect()->route('admin.devices.index')
@@ -72,9 +63,26 @@ class WhatsappDeviceController extends Controller
 
         $devices = $result['data']; // ambil data dari API
 
-       
-        foreach ($devices as $device) {
+        // Get all device_ids from GoWA
+        $gowaDeviceIds = collect($devices)->pluck('id')->toArray();
 
+        // Get all device_ids currently in database
+        $dbDeviceIds = WhatsappDevice::pluck('device_id')->toArray();
+
+        // Find devices to delete (in DB but not in GoWA)
+        $devicesToDelete = array_diff($dbDeviceIds, $gowaDeviceIds);
+
+        // Delete devices not present in GoWA
+        if (!empty($devicesToDelete)) {
+            // Optional: Unlink from stores first
+            Store::whereIn('whatsapp_device_id', $devicesToDelete)
+                ->update(['whatsapp_device_id' => null]);
+
+            WhatsappDevice::whereIn('device_id', $devicesToDelete)->delete();
+        }
+
+        // Update or create devices from GoWA
+        foreach ($devices as $device) {
             $existing = WhatsappDevice::where('device_id', $device['id'])->first();
 
             $data = [
