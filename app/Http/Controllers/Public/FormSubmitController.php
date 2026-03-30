@@ -477,7 +477,8 @@ class FormSubmitController extends Controller
                     if ($response->form->whatsapp_template_as_caption) {
                         $caption = $message;
                     }
-
+                    $url = config('services.gowa.url', env('GOWA_URL'));
+                    dd("masuk ke function sendWhatsAppMessageWithImage",$formattedPhone, $imagePath, $caption, $response, $url);  
                     // Send image with or without caption
                     $imageResult = $this->gowaService->sendImage(
                         $formattedPhone,
